@@ -22,12 +22,16 @@ composer require olegkunitsyn/json-rpc-bundle
 #### Step 2: Enable the Bundle
 Then, enable the bundle by adding it to the list of registered bundles in the `config/bundles.php` file of your project:
 ```php
-// config/bundles.php
-
+# config/bundles.php
 return [
     // ...
     OlegKunitsyn\JsonRpcBundle::class => ['all' => true],
 ];
+```
+
+Start development server:
+```console
+php -S localhost:8000 -t public
 ```
 
 ## Configuration
@@ -46,14 +50,17 @@ The method parameter must follow the convention `{serviceKey}.{method}`
  
 ```yaml
 # config/services.yaml
-App\RpcServices:
-    resource: src/RpcServices
-    tag: ['json_rpc_bundle']         
+services:
+    App\RpcServices\:
+        resource: '../src/RpcServices/'
+        tags:
+          - 'json_rpc_bundle'   
 ```
 
 ```php
 namespace App\RpcServices;
 
+use App\Dto\EchoDto;
 use OlegKunitsyn\JsonRpcBundle\Service\AbstractRpcService;
 
 class MyService extends AbstractRpcService
@@ -82,27 +89,44 @@ readonly class EchoDto
 ```
 
 ### By name (object)
+Request:
 ```console
 curl -X POST localhost:8000/api -d '{"method": "myService.echo", "params": {"value": "hello"}, "id": "1", "jsonrpc": "2.0"}' -H 'Content-Type: application/json'
 ```
+Response:
+```json
+{"jsonrpc":"2.0","result":{"value":"hello"},"id":"1"}
+```
 
 ### By position (array)
+Request:
 ```console
 curl -X POST localhost:8000/api -d '{"method": "myService.echo", "params": ["hello"], "id": "second", "jsonrpc": "2.0"}' -H 'Content-Type: application/json'
 ```
+Response:
+```json
+{"jsonrpc":"2.0","result":{"value":"hello"},"id":"second"}
+```
 
 ### Batch
+Request:
  ```console
  curl -X POST localhost:8000/api -d '[{"method": "myService.echo", "params": {"value": "hello"}, "id": "1", "jsonrpc": "2.0"}, {"method": "myService.echo", "params": ["hello"], "id": "second", "jsonrpc": "2.0"}]' -H 'Content-Type: application/json'
 ```
+Response:
+```json
+[{"jsonrpc":"2.0","result":{"value":"hello"},"id":"1"},{"jsonrpc":"2.0","result":{"value":"hello"},"id":"second"}]
+```
 
-## Response normalization
-JSON-RPC Responses are processed by a Symfony normalizer. Use the `RpcNormalizationContext` attribute to specify a normalization context:
+### Response normalization
+Responses are processed by a Symfony normalizer. Use the `RpcNormalizationContext` attribute to specify a normalization context:
 ```php
 namespace App\RpcServices;
 
-use OlegKunitsyn\JsonRpcBundle\Attribute\RpcNormalizationContext;
+use App\Dto\DateTimeDto;
+use OlegKunitsyn\JsonRpcBundle\Response\RpcNormalizationContext;
 use OlegKunitsyn\JsonRpcBundle\Service\AbstractRpcService;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 class MyService extends AbstractRpcService
 {
@@ -110,7 +134,7 @@ class MyService extends AbstractRpcService
     {
         return 'myService';
     }
-    
+
     #[RpcNormalizationContext([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     public function echo(DateTimeDto $timestamp): DateTimeDto
     {
@@ -118,7 +142,30 @@ class MyService extends AbstractRpcService
     }
 }
 ```
+```php
+namespace App\Dto;
+
+readonly class DateTimeDto
+{
+    public function __construct(public readonly \DateTimeImmutable $timestamp)
+    {
+    }
+}
+```
+
+Request:
  ```console
  curl -X POST localhost:8000/api -d '{"method": "myService.echo", "params": {"timestamp": "2012-04-23T18:25:43.511Z"}, "id": "1", "jsonrpc": "2.0"}' -H 'Content-Type: application/json'
-{"jsonrpc": "2.0", "result": {"timestamp": "2012-04-23"}, "id": "1"}
 ```
+Response:
+```json
+{"jsonrpc":"2.0","result":{"timestamp":"2012-04-23"},"id":"1"}
+```
+
+## Roadmap
+- Performance
+- Security
+- Code coverage
+
+## Credits
+- Gabriel Soullier, [NanofelisJsonRpcBundle](https://github.com/nanofelis/NanofelisJsonRpcBundle) 
