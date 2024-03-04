@@ -1,0 +1,9 @@
+composer.lock
+/coverage
+/var
+/vendor
+/phpunit.xml
+.phpunit.result.cache
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+/.idea

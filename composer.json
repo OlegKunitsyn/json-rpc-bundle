@@ -1,0 +1,50 @@
+{
+  "name": "olegkunitsyn/json-rpc-bundle",
+  "type": "symfony-bundle",
+  "description": "JSON-RPC 2.0 implementation for Symfony",
+  "keywords": [
+    "json-rpc",
+    "api",
+    "symfony"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Olegs Kunicins"
+    },
+    {
+      "name": "Gabriel Soullier"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*",
+    "symfony/options-resolver": "^7.0",
+    "symfony/serializer": "^7.0",
+    "symfony/framework-bundle": "^7.0",
+    "symfony/property-access": "7.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6",
+    "symfony/browser-kit": "^7.0",
+    "symfony/css-selector": "^7.0",
+    "symfony/phpunit-bridge": "^7.0",
+    "phpstan/phpstan-symfony": "^1.0",
+    "friendsofphp/php-cs-fixer": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OlegKunitsyn\\JsonRpcBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OlegKunitsyn\\JsonRpcBundle\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "symfony": {
+      "require": "7.*"
+    }
+  }
+}

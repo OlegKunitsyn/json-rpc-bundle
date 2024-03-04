@@ -1,0 +1,8 @@
+parameters:
+    paths:
+        - .
+    excludePaths:
+        - %rootDir%/../../../vendor
+        - %rootDir%/../../../tests
+        - %rootDir%/../../../var
+    level: 6
